@@ -1,7 +1,9 @@
-gulp-istanbul [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
+gulp-coffee-istanbul [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
 ===========================
 
-[Istanbul][istanbul] unit test coverage plugin for [gulp][gulp].
+[Istanbul][istanbul] unit test coverage plugin for [gulp][gulp], covering coffee and javascript.
+
+Almost entirely stolen from Simon Boudrias and his gulp plugin [gulp-istanbul][original-plugin]
 
 Works on top of any Node.js unit test framework.
 
@@ -9,7 +11,7 @@ Installation
 ---------------
 
 ```shell
-npm install --save-dev gulp-istanbul
+npm install --save-dev gulp-coffee-istanbul
 ```
 
 Example
@@ -19,22 +21,23 @@ In your `gulpfile.js`:
 
 #### Node.js testing
 
-```javascript
-var istanbul = require('gulp-istanbul');
-// We'll use mocha here, but any test framework will work
-var mocha = require('gulp-mocha');
+```coffee
+istanbul = require('gulp-coffee-istanbul')
+# We'll use mocha here, but any test framework will work
+mocha = require('gulp-mocha')
 
-gulp.task('test', function (cb) {
-  gulp.src(['lib/**/*.js', 'main.js'])
-    .pipe(istanbul()) // Covering files
-    .pipe(istanbul.hookRequire()) // Force `require` to return covered files
-    .on('finish', function () {
-      gulp.src(['test/*.js'])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports()) // Creating the reports after tests runned
-        .on('end', cb);
-    });
-});
+jsFiles = ['config/**/*.js', 'controllers/**/*.js', 'models/**/*.js', 'app.js']
+specFiles = ['spec/**/*.coffee']
+coffeeFiles = ['src/**/*.coffee']
+
+gulp.task 'test', ->
+  gulp.src jsFiles.concat(coffeeFiles)
+    .pipe istanbul({includeUntested: true}) # Covering files
+    .pipe istanbul.hookRequire()
+    .on 'finish', ->
+      gulp.src specFiles
+        .pipe mocha reporter: 'spec'
+        .pipe istanbul.writeReports() # Creating the reports after tests run
 ```
 
 #### Browser testing
@@ -45,7 +48,7 @@ Browser testing is hard. If you're not sure what to do, then I suggest you take 
 
 
 ```javascript
-var istanbul = require('gulp-istanbul');
+var istanbul = require('gulp-coffee-istanbul');
 
 gulp.task('test', function (cb) {
   gulp.src(['lib/**/*.js', 'main.js'])
@@ -194,19 +197,20 @@ See also:
 License
 ------------
 
-[MIT License](http://en.wikipedia.org/wiki/MIT_License) (c) Simon Boudrias - 2013
+[MIT License](http://en.wikipedia.org/wiki/MIT_License) (c) Matt Blair - 2014
 
 [istanbul]: http://gotwarlost.github.io/istanbul/
 [gulp]: https://github.com/gulpjs/gulp
+[original-plugin]: https://github.com/SBoudrias/gulp-istanbul
 
-[npm-url]: https://npmjs.org/package/gulp-istanbul
-[npm-image]: https://badge.fury.io/js/gulp-istanbul.svg
+[npm-url]: https://npmjs.org/package/gulp-coffee-istanbul
+[npm-image]: https://badge.fury.io/js/gulp-coffee-istanbul.svg
 
-[travis-url]: http://travis-ci.org/SBoudrias/gulp-istanbul
-[travis-image]: https://secure.travis-ci.org/SBoudrias/gulp-istanbul.svg?branch=master
+[travis-url]: http://travis-ci.org/duereg/gulp-coffee-istanbul
+[travis-image]: https://secure.travis-ci.org/duereg/gulp-coffee-istanbul.svg?branch=master
 
-[depstat-url]: https://david-dm.org/SBoudrias/gulp-istanbul
-[depstat-image]: https://david-dm.org/SBoudrias/gulp-istanbul.svg
+[depstat-url]: https://david-dm.org/duereg/gulp-coffee-istanbul
+[depstat-image]: https://david-dm.org/duereg/gulp-coffee-istanbul.svg
 
 [istanbul-coverage-variable]: http://gotwarlost.github.io/istanbul/public/apidocs/classes/Instrumenter.html
 [istanbul-summarize-coverage]: http://gotwarlost.github.io/istanbul/public/apidocs/classes/ObjectUtils.html#method_summarizeCoverage

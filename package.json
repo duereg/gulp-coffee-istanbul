@@ -1,7 +1,7 @@
 {
   "name": "gulp-coffee-istanbul",
-  "version": "0.5.0",
-  "description": "Istanbul unit test coverage plugin for gulp.",
+  "version": "0.1.0",
+  "description": "Istanbul coffee and js unit test coverage plugin for gulp.",
   "keywords": [
     "gulp",
     "gulp-plugin",
@@ -14,9 +14,9 @@
   "homepage": "https://github.com/duereg/gulp-coffee-istanbul",
   "bugs": "https://github.com/duereg/gulp-coffee-istanbul/issues",
   "author": {
-    "name": "Simon Boudrias",
-    "email": "admin@simonboudrias.com",
-    "url": "https://github.com/SBoudrias"
+    "name": "Matt Blair",
+    "email": "matt@mattblair.co",
+    "url": "https://github.com/duereg"
   },
   "main": "./index.js",
   "repository": {
