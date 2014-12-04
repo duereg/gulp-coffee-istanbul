@@ -10,7 +10,7 @@ var Report = istanbul.Report;
 var Collector = istanbul.Collector;
 var PluginError = gutil.PluginError;
 
-var PLUGIN_NAME = 'gulp-istanbul';
+var PLUGIN_NAME = 'gulp-coffee-istanbul';
 var COVERAGE_VARIABLE = '$$cov_' + new Date().getTime() + '$$';
 
 var plugin = module.exports = function (opts) {
