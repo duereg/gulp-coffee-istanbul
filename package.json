@@ -1,6 +1,6 @@
 {
   "name": "gulp-coffee-istanbul",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Istanbul coffee and js unit test coverage plugin for gulp.",
   "keywords": [
     "gulp",
