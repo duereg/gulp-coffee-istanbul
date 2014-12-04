@@ -1,4 +1,6 @@
-gulp-coffee-istanbul [![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
+[![NPM version][npm-image]][npm-url] [![Build Status][travis-image]][travis-url] [![Dependency Status][depstat-image]][depstat-url]
+
+gulp-coffee-istanbul
 ===========================
 
 [Istanbul][istanbul] unit test coverage plugin for [gulp][gulp], covering coffee and javascript.
