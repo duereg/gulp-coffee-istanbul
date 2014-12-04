@@ -3,7 +3,9 @@
 gulp-coffee-istanbul
 ===========================
 
-[Istanbul][istanbul] unit test coverage plugin for [gulp][gulp], covering coffee and javascript. Allows for in-place testing and coverage of coffee files without the need for compiling and linking to the compiled source. 
+[Istanbul][istanbul] unit test coverage plugin for [gulp][gulp], covering coffee and javascript. 
+
+Allows for in-place testing and coverage of coffee files without the need for compiling and linking to the compiled source. 
 
 Almost entirely stolen from Simon Boudrias and his gulp plugin [gulp-istanbul][original-plugin].
 
