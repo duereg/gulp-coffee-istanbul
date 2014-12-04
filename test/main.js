@@ -1,5 +1,7 @@
 'use strict';
 
+require('coffee-script/register');
+
 var fs = require('fs');
 var assert = require('assert');
 var rimraf = require('rimraf');
@@ -89,175 +91,309 @@ describe('gulp-istanbul', function () {
     });
   });
 
-  describe('istanbul.summarizeCoverage()', function () {
+  describe('when testing coffee', function() {
+    var libPath, testPath;
 
-    it('gets statistics about the test run', function (done) {
-      gulp.src([ 'test/fixtures/lib/*.js' ])
-        .pipe(istanbul())
-        .pipe(istanbul.hookRequire())
-        .on('finish', function () {
-          process.stdout.write = function () {};
-          gulp.src([ 'test/fixtures/test/*.js' ])
-            .pipe(mocha())
-            .on('end', function () {
-              var data = istanbul.summarizeCoverage();
-              assert.equal(data.lines.pct, 75);
-              assert.equal(data.statements.pct, 75);
-              assert.equal(data.functions.pct, 50);
-              assert.equal(data.branches.pct, 100);
-              done();
-            });
-        });
+    beforeEach(function() {
+      libPath = [ 'test/fixtures/lib/*.coffee' ];
+      testPath = [ 'test/fixtures/test/*.coffee' ];
     });
 
-    it('allows inclusion of untested files', function (done) {
-      var COV_VAR = 'untestedCovVar';
+    describe('istanbul.writeReports()', function () {
+      beforeEach(function (done) {
+        // set up coverage
+        gulp.src(libPath)
+          .pipe(istanbul())
+          .pipe(istanbul.hookRequire())
+          .on('finish', done);
+      });
 
-      gulp.src([ 'test/fixtures/lib/*.js' ])
-        .pipe(istanbul({
-            coverageVariable: COV_VAR,
-            includeUntested: true
-        }))
-        .pipe(istanbul.hookRequire())
-        .on('finish', function () {
-          process.stdout.write = function () {};
-          gulp.src([ 'test/fixtures/test/*.js' ])
-            .pipe(mocha())
-            .on('end', function () {
-              var data = istanbul.summarizeCoverage({
-                  coverageVariable: COV_VAR
+      afterEach(function () {
+        rimraf.sync('coverage');
+        rimraf.sync('cov-foo');
+      });
+
+      it('output coverage report', function (done) {
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports());
+
+        process.stdout.write = function (str) {
+          if (str.indexOf('==== Coverage summary ====') >= 0) {
+            done();
+          }
+        };
+      });
+
+      it('create coverage report', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports())
+          .on('end', function () {
+            gutil.log('create coverage report!!! coffee!');
+            assert(fs.existsSync('./coverage'));
+            assert(fs.existsSync('./coverage/lcov.info'));
+            assert(fs.existsSync('./coverage/coverage-final.json'));
+            done();
+          });
+      });
+
+      it('allow specifying report output dir (legacy way)', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports('cov-foo'))
+          .on('end', function () {
+            assert(fs.existsSync('./cov-foo'));
+            assert(fs.existsSync('./cov-foo/lcov.info'));
+            assert(fs.existsSync('./cov-foo/coverage-final.json'));
+            done();
+          });
+      });
+
+      it('allow specifying report output dir', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports({ dir: 'cov-foo' }))
+          .on('end', function () {
+            assert(fs.existsSync('./cov-foo'));
+            assert(fs.existsSync('./cov-foo/lcov.info'));
+            assert(fs.existsSync('./cov-foo/coverage-final.json'));
+            process.stdout.write = out;
+            done();
+          });
+      });
+
+      it('allow specifying report output formats', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports({ dir: 'cov-foo', reporters: ['cobertura'] }))
+          .on('end', function () {
+            assert(fs.existsSync('./cov-foo'));
+            assert(!fs.existsSync('./cov-foo/lcov.info'));
+            assert(fs.existsSync('./cov-foo/cobertura-coverage.xml'));
+            process.stdout.write = out;
+            done();
+          });
+      });
+
+    });
+
+    describe('with defined coverageVariable option', function () {
+      afterEach(function () {
+        rimraf.sync('coverage');
+      });
+
+      it('allow specifying coverage variable', function (done) {
+        process.stdout.write = function () {};
+
+        var coverageVariable = 'CUSTOM_COVERAGE_VARIABLE';
+
+        // set up coverage
+        gulp.src(libPath)
+          .pipe(istanbul({ coverageVariable: coverageVariable }))
+          .pipe(istanbul.hookRequire())
+          .on('finish', function () {
+            gulp.src(testPath)
+              .pipe(mocha())
+              .pipe(istanbul.writeReports({ coverageVariable: coverageVariable }))
+              .on('end', function () {
+                assert(fs.existsSync('./coverage'));
+                assert(fs.existsSync('./coverage/lcov.info'));
+                assert(fs.existsSync('./coverage/coverage-final.json'));
+                process.stdout.write = out;
+                done();
               });
-
-              // If untested files are included, line and statement coverage
-              // drops to 25%
-              assert.equal(data.lines.pct, 37.5);
-              assert.equal(data.statements.pct, 37.5);
-              assert.equal(data.functions.pct, 25);
-              assert.equal(data.branches.pct, 100);
-              done();
-            });
-        });
+          });
+      });
     });
   });
 
-  describe('istanbul.writeReports()', function () {
-    beforeEach(function (done) {
-      // set up coverage
-      gulp.src([ 'test/fixtures/lib/*.js' ])
-        .pipe(istanbul())
-        .pipe(istanbul.hookRequire())
-        .on('finish', done);
+  describe('when testing js', function() {
+    var libPath, testPath;
+
+    beforeEach(function() {
+      libPath = [ 'test/fixtures/lib/*.js' ];
+      testPath = [ 'test/fixtures/test/*.js' ];
     });
 
-    afterEach(function () {
-      rimraf.sync('coverage');
-      rimraf.sync('cov-foo');
+    describe('istanbul.summarizeCoverage()', function () {
+
+      it('gets statistics about the test run', function (done) {
+        var COV_VAR = 'CovVarJs';
+
+        gulp.src(libPath)
+          .pipe(istanbul({coverageVariable: COV_VAR}))
+          .pipe(istanbul.hookRequire())
+          .on('finish', function () {
+            process.stdout.write = function () {};
+            gulp.src(testPath)
+              .pipe(mocha())
+              .on('end', function () {
+                var data = istanbul.summarizeCoverage({
+                    coverageVariable: COV_VAR
+                });
+                assert.equal(data.lines.pct, 75);
+                assert.equal(data.statements.pct, 75);
+                assert.equal(data.functions.pct, 50);
+                assert.equal(data.branches.pct, 100);
+                done();
+              });
+          });
+      });
+
+      it('allows inclusion of untested files', function (done) {
+        var COV_VAR = 'untestedCovVarJs';
+
+        gulp.src(libPath)
+          .pipe(istanbul({
+              coverageVariable: COV_VAR,
+              includeUntested: true
+          }))
+          .pipe(istanbul.hookRequire())
+          .on('finish', function () {
+            process.stdout.write = function () {};
+            gulp.src(testPath)
+              .pipe(mocha())
+              .on('end', function () {
+                var data = istanbul.summarizeCoverage({
+                    coverageVariable: COV_VAR
+                });
+
+                // If untested files are included, line and statement coverage
+                // drops to 25%
+                assert.equal(data.lines.pct, 37.5);
+                assert.equal(data.statements.pct, 37.5);
+                assert.equal(data.functions.pct, 25);
+                assert.equal(data.branches.pct, 100);
+                done();
+              });
+          });
+      });
     });
 
-    it('output coverage report', function (done) {
-      gulp.src([ 'test/fixtures/test/*.js' ])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports());
+    describe('istanbul.writeReports()', function () {
+      beforeEach(function (done) {
+        // set up coverage
+        gulp.src(libPath)
+          .pipe(istanbul())
+          .pipe(istanbul.hookRequire())
+          .on('finish', done);
+      });
 
-      process.stdout.write = function (str) {
-        if (str.indexOf('==== Coverage summary ====') >= 0) {
-          done();
-        }
-      };
+      afterEach(function () {
+        rimraf.sync('coverage');
+        rimraf.sync('cov-foo');
+      });
+
+      it('output coverage report', function (done) {
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports());
+
+        process.stdout.write = function (str) {
+          if (str.indexOf('==== Coverage summary ====') >= 0) {
+            done();
+          }
+        };
+      });
+
+      it('create coverage report', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports())
+          .on('end', function () {
+            assert(fs.existsSync('./coverage'));
+            assert(fs.existsSync('./coverage/lcov.info'));
+            assert(fs.existsSync('./coverage/coverage-final.json'));
+            done();
+          });
+      });
+
+      it('allow specifying report output dir (legacy way)', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports('cov-foo'))
+          .on('end', function () {
+            assert(fs.existsSync('./cov-foo'));
+            assert(fs.existsSync('./cov-foo/lcov.info'));
+            assert(fs.existsSync('./cov-foo/coverage-final.json'));
+            done();
+          });
+      });
+
+      it('allow specifying report output dir', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports({ dir: 'cov-foo' }))
+          .on('end', function () {
+            assert(fs.existsSync('./cov-foo'));
+            assert(fs.existsSync('./cov-foo/lcov.info'));
+            assert(fs.existsSync('./cov-foo/coverage-final.json'));
+            process.stdout.write = out;
+            done();
+          });
+      });
+
+      it('allow specifying report output formats', function (done) {
+        process.stdout.write = function () {};
+        gulp.src(testPath)
+          .pipe(mocha())
+          .pipe(istanbul.writeReports({ dir: 'cov-foo', reporters: ['cobertura'] }))
+          .on('end', function () {
+            assert(fs.existsSync('./cov-foo'));
+            assert(!fs.existsSync('./cov-foo/lcov.info'));
+            assert(fs.existsSync('./cov-foo/cobertura-coverage.xml'));
+            process.stdout.write = out;
+            done();
+          });
+      });
+
     });
 
-    it('create coverage report', function (done) {
-      process.stdout.write = function () {};
-      gulp.src([ 'test/fixtures/test/*.js' ])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports())
-        .on('end', function () {
-          assert(fs.existsSync('./coverage'));
-          assert(fs.existsSync('./coverage/lcov.info'));
-          assert(fs.existsSync('./coverage/coverage-final.json'));
-          done();
-        });
-    });
+    describe('with defined coverageVariable option', function () {
+      afterEach(function () {
+        rimraf.sync('coverage');
+      });
 
-    it('allow specifying report output dir (legacy way)', function (done) {
-      process.stdout.write = function () {};
-      gulp.src([ 'test/fixtures/test/*.js' ])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports('cov-foo'))
-        .on('end', function () {
-          assert(fs.existsSync('./cov-foo'));
-          assert(fs.existsSync('./cov-foo/lcov.info'));
-          assert(fs.existsSync('./cov-foo/coverage-final.json'));
-          done();
-        });
-    });
+      it('allow specifying coverage variable', function (done) {
+        process.stdout.write = function () {};
 
-    it('allow specifying report output dir', function (done) {
-      process.stdout.write = function () {};
-      gulp.src([ 'test/fixtures/test/*.js' ])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports({ dir: 'cov-foo' }))
-        .on('end', function () {
-          assert(fs.existsSync('./cov-foo'));
-          assert(fs.existsSync('./cov-foo/lcov.info'));
-          assert(fs.existsSync('./cov-foo/coverage-final.json'));
-          process.stdout.write = out;
-          done();
-        });
-    });
+        var coverageVariable = 'CUSTOM_COVERAGE_VARIABLE';
 
-    it('allow specifying report output formats', function (done) {
-      process.stdout.write = function () {};
-      gulp.src([ 'test/fixtures/test/*.js' ])
-        .pipe(mocha())
-        .pipe(istanbul.writeReports({ dir: 'cov-foo', reporters: ['cobertura'] }))
-        .on('end', function () {
-          assert(fs.existsSync('./cov-foo'));
-          assert(!fs.existsSync('./cov-foo/lcov.info'));
-          assert(fs.existsSync('./cov-foo/cobertura-coverage.xml'));
-          process.stdout.write = out;
-          done();
-        });
+        // set up coverage
+        gulp.src(libPath)
+          .pipe(istanbul({ coverageVariable: coverageVariable }))
+          .pipe(istanbul.hookRequire())
+          .on('finish', function () {
+            gulp.src(testPath)
+              .pipe(mocha())
+              .pipe(istanbul.writeReports({ coverageVariable: coverageVariable }))
+              .on('end', function () {
+                assert(fs.existsSync('./coverage'));
+                assert(fs.existsSync('./coverage/lcov.info'));
+                assert(fs.existsSync('./coverage/coverage-final.json'));
+                process.stdout.write = out;
+                done();
+              });
+          });
+      });
     });
-
-    it('throws when specifying invalid reporters', function () {
-      var actualErr;
-      try {
-        istanbul.writeReports({ reporters: ['not-a-valid-reporter'] });
-      } catch (err) {
-        actualErr = err;
-      }
-      assert.equal(actualErr.plugin, 'gulp-istanbul');
-    });
-
   });
 
-  describe('with defined coverageVariable option', function () {
-    afterEach(function () {
-      rimraf.sync('coverage');
-    });
-
-    it('allow specifying coverage variable', function (done) {
-      process.stdout.write = function () {};
-
-      var coverageVariable = 'CUSTOM_COVERAGE_VARIABLE';
-
-      // set up coverage
-      gulp.src([ 'test/fixtures/lib/*.js' ])
-        .pipe(istanbul({ coverageVariable: coverageVariable }))
-        .pipe(istanbul.hookRequire())
-        .on('finish', function () {
-          gulp.src([ 'test/fixtures/test/*.js' ])
-            .pipe(mocha())
-            .pipe(istanbul.writeReports({ coverageVariable: coverageVariable }))
-            .on('end', function () {
-              assert(fs.existsSync('./coverage'));
-              assert(fs.existsSync('./coverage/lcov.info'));
-              assert(fs.existsSync('./coverage/coverage-final.json'));
-              process.stdout.write = out;
-              done();
-            });
-        });
-    });
+  it('throws when specifying invalid reporters', function () {
+    var actualErr;
+    try {
+      istanbul.writeReports({ reporters: ['not-a-valid-reporter'] });
+    } catch (err) {
+      actualErr = err;
+    }
+    assert.equal(actualErr.plugin, 'gulp-istanbul');
   });
 });

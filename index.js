@@ -3,6 +3,7 @@
 var through = require('through2').obj;
 var path = require('path');
 var istanbul = require('istanbul');
+var CoffeeInstrumenter = require('istanbul/lib/coffee-instrumenter');
 var gutil = require('gulp-util');
 var _ = require('lodash');
 var Report = istanbul.Report;
@@ -17,7 +18,8 @@ var plugin = module.exports = function (opts) {
   opts.includeUntested = opts.includeUntested === true;
   if (!opts.coverageVariable) opts.coverageVariable = COVERAGE_VARIABLE;
 
-  var instrumenter = new istanbul.Instrumenter(opts);
+  var jsInstrumenter = new istanbul.Instrumenter(opts);
+  var coffeeInstrumenter = new CoffeeInstrumenter(opts);
 
   return through(function (file, enc, cb) {
     cb = _.once(cb);
@@ -25,7 +27,7 @@ var plugin = module.exports = function (opts) {
       return cb(new PluginError(PLUGIN_NAME, 'streams not supported'));
     }
 
-    instrumenter.instrument(file.contents.toString(), file.path, function (err, code) {
+    var instrumentHelper = function (err, code) {
       if (err) {
         return cb(new PluginError(
           PLUGIN_NAME,
@@ -51,7 +53,14 @@ var plugin = module.exports = function (opts) {
       }
 
       return cb(err, file);
-    });
+    };
+
+    if (path.extname(file.path) === '.js') {
+      jsInstrumenter.instrument(file.contents.toString(), file.path, instrumentHelper);
+    } else if (path.extname(file.path) === '.coffee') {
+      coffeeInstrumenter.instrument(file.contents.toString(), file.path, instrumentHelper);
+    }
+
   });
 };
 
