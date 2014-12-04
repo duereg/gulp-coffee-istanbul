@@ -12,7 +12,7 @@ var mocha = require('gulp-mocha');
 
 var out = process.stdout.write.bind(process.stdout);
 
-describe('gulp-istanbul', function () {
+describe('gulp-coffee-istanbul', function () {
 
   afterEach(function () {
     process.stdout.write = out; // put it back even if test fails
@@ -394,6 +394,6 @@ describe('gulp-istanbul', function () {
     } catch (err) {
       actualErr = err;
     }
-    assert.equal(actualErr.plugin, 'gulp-istanbul');
+    assert.equal(actualErr.plugin, 'gulp-coffee-istanbul');
   });
 });
