@@ -120,7 +120,7 @@ plugin.writeReports = function (opts) {
   cover.on('end', function () {
     var collector = new Collector();
 
-    // revert to an object if there are not macthing source files.
+    // revert to an object if there are not matching source files.
     collector.add(global[opts.coverageVariable] || {});
 
     reporters.forEach(function (report) {
