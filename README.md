@@ -9,8 +9,6 @@ Allows for in-place testing and coverage of coffee files without the need for co
 
 Almost entirely stolen from Simon Boudrias and his gulp plugin [gulp-istanbul][original-plugin].
 
-Please note: this plugin uses [coffee-script-redux][coffee-script-redux] for instrumenting the .coffee files in place. So some language constructs that work under coffee-script won't compile correctly. Check out [this article](https://github.com/michaelficarra/CoffeeScriptRedux/wiki/Intentional-Deviations-From-jashkenas-coffee-script) for notable differences.
-
 Works on top of any Node.js unit test framework.
 
 Installation
@@ -208,7 +206,6 @@ License
 [istanbul]: http://gotwarlost.github.io/istanbul/
 [gulp]: https://github.com/gulpjs/gulp
 [original-plugin]: https://github.com/SBoudrias/gulp-istanbul
-[coffee-script-redux]: https://github.com/michaelficarra/CoffeeScriptRedux
 
 [npm-url]: https://npmjs.org/package/gulp-coffee-istanbul
 [npm-image]: https://badge.fury.io/js/gulp-coffee-istanbul.svg
