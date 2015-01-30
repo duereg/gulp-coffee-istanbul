@@ -35,9 +35,9 @@
     "through2": "^0.6.3"
   },
   "devDependencies": {
-    "gulp": "^3.6.2",
+    "gulp": "^3.8.10",
     "gulp-mocha": "^2.0.0",
-    "jshint": "^2.5.0",
+    "jshint": "^2.6.0",
     "mocha": "^2.1.0",
     "rimraf": "^2.2.8"
   },
