@@ -2,8 +2,8 @@
 
 var through = require('through2').obj;
 var path = require('path');
-var istanbul = require('istanbul');
-var CoffeeInstrumenter = require('istanbul/lib/coffee-instrumenter');
+var istanbul = require('istanbul-traceur');
+var CoffeeInstrumenter = require('istanbul-traceur/node_modules/istanbul/lib/coffee-instrumenter');
 var gutil = require('gulp-util');
 var _ = require('lodash');
 var Report = istanbul.Report;
@@ -90,7 +90,9 @@ plugin.summarizeCoverage = function (opts) {
 
   var collector = new Collector();
   collector.add(global[opts.coverageVariable]);
-  return istanbul.utils.summarizeCoverage(collector.getFinalCoverage());
+  var finalCoverage = collector.getFinalCoverage();
+
+  return istanbul.utils.summarizeCoverage(finalCoverage);
 };
 
 plugin.writeReports = function (opts) {
