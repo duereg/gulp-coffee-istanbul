@@ -213,29 +213,35 @@ describe('gulp-coffee-istanbul', function () {
   });
 
   describe('when testing js', function() {
-    var libPath, testPath;
+    var libPath, testPath, write;
 
     beforeEach(function() {
       libPath = [ 'test/fixtures/lib/*.js' ];
       testPath = [ 'test/fixtures/test/*.js' ];
+      write = process.stdout.write;
+    });
+
+    afterEach(function() {
+      process.stdout.write = write;
     });
 
     describe('istanbul.summarizeCoverage()', function () {
-
       it('gets statistics about the test run', function (done) {
         var COV_VAR = 'CovVarJs';
+        process.stdout.write = function () {};
 
         gulp.src(libPath)
           .pipe(istanbul({coverageVariable: COV_VAR}))
           .pipe(istanbul.hookRequire())
           .on('finish', function () {
-            process.stdout.write = function () {};
             gulp.src(testPath)
               .pipe(mocha())
               .on('end', function () {
+                process.stdout.write = write;
                 var data = istanbul.summarizeCoverage({
                     coverageVariable: COV_VAR
                 });
+
                 assert.equal(data.lines.pct, 75);
                 assert.equal(data.statements.pct, 75);
                 assert.equal(data.functions.pct, 50);
@@ -247,18 +253,19 @@ describe('gulp-coffee-istanbul', function () {
 
       it('allows inclusion of untested files', function (done) {
         var COV_VAR = 'untestedCovVarJs';
+        process.stdout.write = function () {};
 
         gulp.src(libPath)
           .pipe(istanbul({
-              coverageVariable: COV_VAR,
-              includeUntested: true
+            coverageVariable: COV_VAR,
+            includeUntested: true
           }))
           .pipe(istanbul.hookRequire())
           .on('finish', function () {
-            process.stdout.write = function () {};
             gulp.src(testPath)
               .pipe(mocha())
               .on('end', function () {
+                process.stdout.write = write;
                 var data = istanbul.summarizeCoverage({
                     coverageVariable: COV_VAR
                 });
