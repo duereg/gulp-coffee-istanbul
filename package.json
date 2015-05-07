@@ -28,7 +28,7 @@
     "test": "mocha -R spec"
   },
   "dependencies": {
-    "coffee-script": "^1.8.0",
+    "coffee-script": "^1.9.0",
     "gulp-util": "^3.0.2",
     "istanbul-traceur": "duereg/istanbul-traceur",
     "lodash": "^3.0.1",
