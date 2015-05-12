@@ -201,7 +201,7 @@ See also:
 License
 ------------
 
-[MIT License](http://en.wikipedia.org/wiki/MIT_License) (c) Matt Blair - 2014
+[MIT License](http://en.wikipedia.org/wiki/MIT_License) (c) Matt Blair - 2015
 
 [istanbul]: http://gotwarlost.github.io/istanbul/
 [gulp]: https://github.com/gulpjs/gulp
