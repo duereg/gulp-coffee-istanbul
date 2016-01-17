@@ -243,8 +243,8 @@ describe('gulp-coffee-istanbul', function () {
                 });
 
                 try{
-                  assert.equal(data.lines.pct, 80);
-                  assert.equal(data.statements.pct, 80);
+                  assert.equal(data.lines.pct, 75);
+                  assert.equal(data.statements.pct, 75);
                   assert.equal(data.functions.pct, 50);
                   assert.equal(data.branches.pct, 100);
                   done();
@@ -278,8 +278,8 @@ describe('gulp-coffee-istanbul', function () {
                 // If untested files are included, line and statement coverage
                 // drops to 25%
                 try{
-                  assert.equal(data.lines.pct, 40);
-                  assert.equal(data.statements.pct, 40);
+                  assert.equal(data.lines.pct, 37.5);
+                  assert.equal(data.statements.pct, 37.5);
                   assert.equal(data.functions.pct, 25);
                   assert.equal(data.branches.pct, 100);
                   done();
