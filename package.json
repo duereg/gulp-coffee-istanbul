@@ -30,6 +30,7 @@
   "dependencies": {
     "coffee-script": "^1.9.0",
     "gulp-util": "^3.0.2",
+    "ibrik": "^2.0.0",
     "istanbul-traceur": "duereg/istanbul-traceur",
     "lodash": "^4.0.0",
     "through2": "^2.0.0"
